@@ -1,0 +1,39 @@
+<launch>
+  
+  <param name="robot_description" command="$(find xacro)/xacro $(find food_serving_robot)/urdf/robot.xacro" />
+  
+  <arg name="x" default="1.5"/>
+  <arg name="y" default="4.25"/>
+  <arg name="z" default="0.05"/>
+  <arg name="roll" default="0"/>
+  <arg name="pitch" default="0"/>
+  <arg name="yaw" default="3.14"/>
+
+  <arg name="cafe" value="$(find food_serving_robot)/worlds/cafe.world"/>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="debug" value="true"/>
+    <arg name="gui" value="true" />
+    <!-- <arg name="verbose" value="true"/> -->
+    <arg name="world_name" value="$(arg cafe)"/>
+  </include>
+
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-param robot_description -urdf -model Food_Serving_Robot
+              -x $(arg x) -y $(arg y) -z $(arg z)
+              -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>
+  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
+
+  <rosparam file="$(find food_serving_robot)/config/robot_arm_controller.yaml" 
+    command="load"/>
+  
+    <node name="controller_spawner" ns="/" output="screen" pkg="controller_manager" respawn="false" type="spawner" args="l_shoulder_pan_joint_controller l_shoulder_lift_joint_controller l_elbow_joint_controller l_wrist_1_joint_controller l_wrist_2_joint_controller l_wrist_3_joint_controller 
+    l_finger_joint_controller
+    r_shoulder_pan_joint_controller r_shoulder_lift_joint_controller r_elbow_joint_controller r_wrist_1_joint_controller r_wrist_2_joint_controller r_wrist_3_joint_controller r_finger_joint_controller"/>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher"      type="joint_state_publisher">
+    <param name="use_gui" value="false"/>
+  </node>
+  
+</launch>

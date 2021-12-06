@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+   <param name="/use_sim_time" value="true"/>
+
+ <!-- Run the map server --> 
+   <node name="map_server" pkg="map_server" type="map_server" args="$(find food_serving_robot)/maps/map_0.1.yaml">
+      <param name="frame_id" value="odom"/>
+   </node>
+
+   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find food_serving_robot)/food_serving_robot.rviz" />
+
+   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+      <rosparam file="$(find food_serving_robot)/config/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+      <rosparam file="$(find food_serving_robot)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find food_serving_robot)/config/local_costmap_params.yaml" command="load" />
+      <rosparam file="$(find food_serving_robot)/config/global_costmap_params.yaml" command="load" /> 
+      <!-- <rosparam file="$(find food_serving_robot)/config/base_local_planner_params.yaml" command="load" /> -->
+
+      <!-- <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/> -->
+      <!-- <rosparam file="$(find food_serving_robot)/config/dwa_local_planner_params.yaml" command="load" /> -->
+
+      <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+      <rosparam file="$(find food_serving_robot)/config/teb_local_planner_params.yaml" command="load" />
+
+      <rosparam file="$(find food_serving_robot)/config/move_base_params.yaml" command="load" />
+      <rosparam file="$(find food_serving_robot)/config/base_global_planner.yaml" command="load" />
+   </node>
+ 
+</launch> 
